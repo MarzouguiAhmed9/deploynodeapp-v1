@@ -3,6 +3,7 @@ pipeline {
         dockerimagename = "nodeapp:v2"
         dockerImage = ""
         pushedImage = "ahmed20007/nodeapp"  // Define pushed image with your Docker Hub username
+        dockerPAT = "dckr_pat_fyfqzqTZu0jRdTHxwZtPBLW7Gu0" // Docker Personal Access Token
     }
 
     agent any
@@ -30,13 +31,14 @@ pipeline {
             }
             steps {
                 script {
+                    // Login using the Docker Personal Access Token (PAT)
+                    sh "echo $dockerPAT | docker login -u ahmed20007 --password-stdin"
+
                     // Tag the image with your Docker Hub username and repository
-                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                        // Tag the image with the appropriate Docker Hub repository
-                        sh "docker tag ${dockerimagename} ${pushedImage}:latest"
-                        // Push the image to Docker Hub with the correct tag
-                        sh "docker push ${pushedImage}:latest"
-                    }
+                    sh "docker tag ${dockerimagename} ${pushedImage}:latest"
+                    
+                    // Push the image to Docker Hub with the correct tag
+                    sh "docker push ${pushedImage}:latest"
                 }
             }
         }
