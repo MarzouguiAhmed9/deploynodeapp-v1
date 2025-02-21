@@ -1,53 +1,49 @@
 pipeline {
-    agent any
 
-    environment {
-        registryCredential = 'dockerhublogin'  // Your Docker Hub credentials ID in Jenkins
-        pushedImage = "ahmed20007/dockerimage"  // The correct Docker Hub image name
+  environment {
+    dockerimagename = "nodeapp:v2"
+    dockerImage = ""
+  }
+
+  agent any
+
+  stages {
+
+   stage('Checkout Source') {
+     steps {
+       git branch: 'main', url: 'https://github.com/MarzouguiAhmed9/deploynodeapp-v1.git'
+     }
+   }
+
+
+    stage('Build image') {
+      steps{
+        script {
+          dockerImage = docker.build(dockerimagename)
+        }
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/your-repo.git'  // Replace with your repo
-            }
+    stage('Pushing Image') {
+      environment {
+        registryCredential = 'dockerhublogin' 
+      }
+      steps{
+        script {
+          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
+            dockerImage.push("latest")
+          }
         }
-
-        stage('Build image') {
-            steps {
-                script {
-                    dockerImage = docker.build("dockerimage:latest")  // Build locally
-                }
-            }
-        }
-
-        stage('Push Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                        sh "docker tag dockerimage:latest ${pushedImage}:latest"  // Correct tagging
-                        sh "docker push ${pushedImage}:latest"  // Push with correct tag
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    echo "Deploying ${pushedImage}:latest..."
-                    // Add deployment steps (e.g., Kubernetes, Docker Compose, etc.)
-                }
-            }
-        }
+      }
     }
 
-    post {
-        success {
-            echo "Build and push Successful! ✅"
+    stage('Deploying App to Kubernetes') {
+      steps {
+        script {
+          kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
         }
-        failure {
-            echo "Pipeline failed! ❌"
-        }
+      }
     }
+
+  }
 }
