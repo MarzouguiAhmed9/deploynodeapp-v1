@@ -1,10 +1,10 @@
-FROM node:latest
+FROM node:16
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
