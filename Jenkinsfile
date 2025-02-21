@@ -5,7 +5,7 @@ pipeline {
         pushedImage = "ahmed20007/nodeapp"  // Define pushed image with your Docker Hub username
         dockerPAT = "dckr_pat_fyfqzqTZu0jRdTHxwZtPBLW7Gu0" // Docker Personal Access Token
         KUBE_CA_CERT_PATH = '/home/ahmed/.minikube/ca.crt'  // Path to the existing Kubernetes certificate
-        KUBE_CONFIG_PATH = '/home/ahmed/.kube/config'        // Path to the Kubernetes config
+        KUBE_CREDENTIALS = 'kubernetes'  // Reference to the Jenkins Kubernetes credential ID
     }
 
     agent any
@@ -61,13 +61,11 @@ pipeline {
                     sh "sudo chmod 644 ${KUBE_CA_CERT_PATH}"
                     sh "sudo chown ahmed:ahmed ${KUBE_CA_CERT_PATH}"
 
-                    // Deploy the app to Kubernetes using the existing certificate and kubeconfig
+                    // Deploy the app to Kubernetes using the Jenkins Kubernetes credentials
                     kubernetesDeploy(
-                        configs: "deploymentservice.yml",      // Path to your Kubernetes YAML file
-                        kubeconfig: KUBE_CONFIG_PATH,          // Path to the kubeconfig file
-                        kubeContext: "minikube",               // Context in your kubeconfig
-                        kubeNamespace: "default",              // Namespace where you want to deploy
-                        certificate: KUBE_CA_CERT_PATH        // Path to your certificate
+                        configs: "deploymentservice.yml",  // Path to your Kubernetes YAML file
+                        kubeconfigId: KUBE_CREDENTIALS,    // Reference to the Kubernetes credentials in Jenkins
+                        kubeNamespace: "default"           // Namespace where you want to deploy
                     )
                 }
             }
