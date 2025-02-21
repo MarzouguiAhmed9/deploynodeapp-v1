@@ -65,7 +65,6 @@ pipeline {
                     kubernetesDeploy(
                         configs: "deploymentservice.yml",  // Path to your Kubernetes YAML file
                         kubeconfigId: KUBE_CREDENTIALS,    // Reference to the Kubernetes credentials in Jenkins
-                        kubeNamespace: "default"           // Namespace where you want to deploy
                     )
                 }
             }
