@@ -9,11 +9,12 @@ pipeline {
 
   stages {
 
-    stage('Checkout Source') {
-      steps {
-        git 'https://github.com/MarzouguiAhmed9/deploynodeapp-v1.git'
-      }
-    }
+   stage('Checkout Source') {
+     steps {
+       git branch: 'main', url: 'https://github.com/MarzouguiAhmed9/deploynodeapp-v1.git'
+     }
+   }
+
 
     stage('Build image') {
       steps{
