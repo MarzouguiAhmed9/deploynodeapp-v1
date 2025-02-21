@@ -1,49 +1,49 @@
 pipeline {
+    agent any
 
-  environment {
-    dockerimagename = "nodeapp:v2"
-    dockerImage = ""
-  }
-
-  agent any
-
-  stages {
-
-   stage('Checkout Source') {
-     steps {
-       git branch: 'main', url: 'https://github.com/MarzouguiAhmed9/deploynodeapp-v1.git'
-     }
-   }
-
-
-    stage('Build image') {
-      steps{
-        script {
-          dockerImage = docker.build(dockerimagename)
-        }
-      }
+    environment {
+        registryCredential = 'dockerhublogin'  // Jenkins credentials for Docker Hub login
+        dockerImageName = 'nodeapp'  // The name of the Docker image
+        dockerHubUsername = 'ahmed20007'  // Your Docker Hub username
     }
 
-    stage('Pushing Image') {
-      environment {
-        registryCredential = 'dockerhublogin' // Jenkins credentials ID
-      }
-      steps{
-        script {
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
-            dockerImage.push("latest")
-          }
+    stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    dockerImage = docker.build("${dockerImageName}:v2")
+                }
+            }
         }
-      }
-    }
 
-    stage('Deploying App to Kubernetes') {
-      steps {
-        script {
-          kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
+        stage('Tag Image') {
+            steps {
+                script {
+                    // Tag the image with your Docker Hub username and repository
+                    dockerImage.tag("${dockerHubUsername}/${dockerImageName}:v2")
+                }
+            }
         }
-      }
-    }
 
-  }
+        stage('Push Image') {
+            steps {
+                script {
+                    // Push the image to Docker Hub with the specified tag
+                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                        dockerImage.push("${dockerHubUsername}/${dockerImageName}:v2")
+                    }
+                }
+            }
+        }
+
+        stage('Deploying App to Kubernetes') {
+            steps {
+                script {
+                    // Deploy the app to Kubernetes
+                    kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
+                }
+            }
+        }
+    }
 }
