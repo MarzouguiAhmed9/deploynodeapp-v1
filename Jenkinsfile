@@ -9,6 +9,16 @@ pipeline {
     agent any
 
     stages {
+        stage('Fix Kubernetes Permissions') {
+    steps {
+        script {
+            // Ensure the Kubernetes certificate file has correct permissions
+            sh 'sudo chmod 644 /home/ahmed/.minikube/ca.crt'
+            sh 'sudo chown ahmed:ahmed /home/ahmed/.minikube/ca.crt'
+        }
+    }
+}
+
 
         stage('Checkout Source') {
             steps {
