@@ -7,7 +7,7 @@ pipeline {
         KUBE_CA_CERT_PATH = '/home/ahmed/.minikube/ca.crt'  // Path to the existing Kubernetes certificate
         KUBE_CREDENTIALS = 'kubernetes'  // Reference to the Jenkins Kubernetes credential ID
         KUBERNETES_URL = 'http://127.0.0.1:8081'  // Updated Minikube API URL
-        SONAR_TOKEN = 'jenkins-sonar'
+        SONAR_TOKEN = 'jenkins-sonar'  // SonarQube token for analysis
     }
 
     agent any
@@ -32,8 +32,8 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') { // Ensures the right SonarQube environment is used
-                        // Run the SonarQube scan with Maven
-                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar -Dsonar.projectKey=nodeapp -Dsonar.login=$SONAR_TOKEN'
+                        // Run the SonarQube scan with SonarScanner for Node.js (ensure this script runs in the root folder of your Node.js app)
+                        sh 'sonar-scanner -Dsonar.projectKey=nodeapp -Dsonar.login=$SONAR_TOKEN'
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                    dockerImage = docker.build(dockerimagename)
+                    dockerImage = docker.build(dockerimagename)  // Build Docker image using the Dockerfile for Node.js
                 }
             }
         }
@@ -68,7 +68,7 @@ pipeline {
 
                     withEnv(["KUBERNETES_URL=${KUBERNETES_URL}"]) {
                         kubernetesDeploy(
-                            configs: "deploymentservice.yml",
+                            configs: "deploymentservice.yml",  // Update this to the correct YAML file for your Node.js deployment
                             kubeconfigId: KUBE_CREDENTIALS
                         )
                     }
