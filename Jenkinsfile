@@ -28,22 +28,10 @@ pipeline {
             }
         }
 
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq1') {  // Use the SonarQube environment 'sq1'
-                    withCredentials([string(credentialsId: 'jenkins-sonar', variable: 'SONAR_TOKEN')]) {  // Use the SonarQube token from Jenkins credentials
-                        sh '''
-                            sonar-scanner \
-                            -Dsonar.projectKey=nodeapp \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://127.0.0.1:9000 \
-                            -Dsonar.login=$SONAR_TOKEN \
-                            -Dsonar.qualitygate.wait=true  // Wait for the quality gate to pass
-                        '''
-                    }
-                }
-            }
-        }
+  stage('SonarQube analysis') {
+    withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') { // You can override the credential to be used
+      sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+    }
 
         stage('Build image') {
             steps {
