@@ -28,10 +28,16 @@ pipeline {
             }
         }
 
-  stage('SonarQube analysis') {
-    withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') { // You can override the credential to be used
-      sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
-    }
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') { // Ensures the right SonarQube environment is used
+                        // Run the SonarQube scan with Maven
+                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar -Dsonar.projectKey=nodeapp -Dsonar.login=$SONAR_TOKEN'
+                    }
+                }
+            }
+        }
 
         stage('Build image') {
             steps {
