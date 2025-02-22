@@ -1,0 +1,2 @@
+Copy the Kubernetes config to Jenkins’s home directory to give Jenkins the necessary credentials to interact with the cluster.
+Change Ownership to ensure Jenkins has permission to read the config and set proper permissions to secure access to the config file
