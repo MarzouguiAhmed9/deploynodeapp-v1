@@ -8,6 +8,8 @@ pipeline {
         KUBE_CREDENTIALS = 'kubernetes'  // Reference to the Jenkins Kubernetes credential ID
         KUBERNETES_URL = 'http://127.0.0.1:8081'  // Updated Minikube API URL
         SONAR_TOKEN = 'jenkins-sonar'  // SonarQube token for analysis
+        SONAR_SCANNER_HOME = '/opt/sonar-scanner-4.7.0.2747-linux'  // Path to the sonar-scanner installation
+        PATH = "$SONAR_SCANNER_HOME/bin:$PATH"  // Add sonar-scanner's bin directory to the PATH
     }
 
     agent any
@@ -31,7 +33,7 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') { // Ensures the right SonarQube environment is used
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') {
                         // Run the SonarQube scan with SonarScanner for Node.js (ensure this script runs in the root folder of your Node.js app)
                         sh 'sonar-scanner -Dsonar.projectKey=nodeapp -Dsonar.login=$SONAR_TOKEN'
                     }
