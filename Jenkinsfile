@@ -7,6 +7,7 @@ pipeline {
         KUBE_CA_CERT_PATH = '/home/ahmed/.minikube/ca.crt'  // Path to the existing Kubernetes certificate
         KUBE_CREDENTIALS = 'kubernetes'  // Reference to the Jenkins Kubernetes credential ID
         KUBERNETES_URL = 'http://127.0.0.1:8081'  // Updated Minikube API URL
+        SONAR_TOKEN = 'jenkins-sonar'
     }
 
     agent any
@@ -27,22 +28,23 @@ pipeline {
             }
         }
 
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq1') {
-                                withCredentials([string(credentialsId: 'jenkins-sonar', variable: 'SONAR_TOKEN')]) {
-
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=nodeapp \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://127.0.0.1:9000 \
-                        -Dsonar.login=$SONAR_TOKEN \
-                        -Dsonar.qualitygate.wait=true
-                    '''}
-                }
+stage('Scan') {
+    steps {
+        withSonarQubeEnv('sq1') {
+            withCredentials([string(credentialsId: 'jenkins-sonar', variable: 'SONAR_TOKEN')]) {
+                sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=nodeapp \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://127.0.0.1:9000 \
+                    -Dsonar.login=$SONAR_TOKEN \
+                    -Dsonar.qualitygate.wait=true
+                '''
             }
         }
+    }
+}
+
 
         stage('Build image') {
             steps {
