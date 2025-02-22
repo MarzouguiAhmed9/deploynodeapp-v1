@@ -35,7 +35,7 @@ pipeline {
                 script {
                     withSonarQubeEnv(credentialsId: 'jenkins-sonar', installationName: 'sq1') {
                         // Run the SonarQube scan with SonarScanner for Node.js (ensure this script runs in the root folder of your Node.js app)
-                        sh 'sonar-scanner -Dsonar.projectKey=nodeapp -Dsonar.login=$SONAR_TOKEN'
+                        sh 'sonar-scanner -Dsonar.projectKey=nodeapp -Dsonar.login=squ_ce6e5891e14be718342e2557067f57ebba299693'
                     }
                 }
             }
