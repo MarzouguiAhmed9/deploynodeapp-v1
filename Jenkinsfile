@@ -30,6 +30,8 @@ pipeline {
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
+                                withCredentials([string(credentialsId: 'jenkins-sonar', variable: 'SONAR_TOKEN')]) {
+
                     sh '''
                         sonar-scanner \
                         -Dsonar.projectKey=nodeapp \
@@ -37,7 +39,7 @@ pipeline {
                         -Dsonar.host.url=http://127.0.0.1:9000 \
                         -Dsonar.login=$SONAR_TOKEN \
                         -Dsonar.qualitygate.wait=true
-                    '''
+                    '''}
                 }
             }
         }
