@@ -6,7 +6,7 @@ pipeline {
         dockerPAT = "dckr_pat_fyfqzqTZu0jRdTHxwZtPBLW7Gu0" // Docker Personal Access Token
         KUBE_CA_CERT_PATH = '/home/ahmed/.minikube/ca.crt'  // Path to the existing Kubernetes certificate
         KUBE_CREDENTIALS = 'kubernetes'  // Reference to the Jenkins Kubernetes credential ID
-        KUBERNETES_URL = 'http://127.0.0.1:8081'  // Updated Minikube API URL
+        KUBERNETES_URL = 'http://127.0.0.1:8081'  // Updated Minikube API URLl
     }
 
     agent any
