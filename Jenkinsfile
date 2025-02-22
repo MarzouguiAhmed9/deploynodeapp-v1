@@ -29,7 +29,7 @@ pipeline {
 
         stage('Scan') {
             steps {
-                withSonarQubeEnv('SONARQUBE_SERVER') {
+                withSonarQubeEnv('sq1') {
                     sh '''
                         sonar-scanner \
                         -Dsonar.projectKey=nodeapp \
